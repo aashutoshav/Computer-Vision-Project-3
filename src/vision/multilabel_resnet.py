@@ -30,11 +30,6 @@ class MultilabelResNet18(nn.Module):
         for param in self.conv_layers.parameters():
             param.requires_grad = False
 
-        for param in resnet.layer4.parameters():  
-            param.requires_grad = True
-        for param in resnet.layer3.parameters():  
-            param.requires_grad = True
-
         in_feats = resnet.fc.in_features
         self.activation = nn.Sigmoid()
         self.fc_layers = nn.Linear(in_feats, 7)
