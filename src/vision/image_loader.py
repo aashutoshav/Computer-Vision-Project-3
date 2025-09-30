@@ -239,16 +239,33 @@ class MultiLabelImageLoader(data.Dataset):
         ############################################################################
 
         target_classes = {"coast", "highway", "mountain", "opencountry", "street"}
+        column_names = [
+            "class_name",
+            "image_name",
+            "clouds",
+            "water_body",
+            "people",
+            "animals",
+            "natural",
+            "man-made",
+            "vehicle",
+        ]
 
-        df = pd.read_csv(self.labels_csv)
+        df = pd.read_csv(
+            self.labels_csv, 
+            sep=',',             
+            header=None,         
+            names=column_names   
+        )
+
         attribute_cols = df.columns[2:]
 
         for index, row in df.iterrows():
-            class_name = row["class"]
+            class_name = row["class_name"]
 
             if class_name in target_classes:
-                image_name = row["image"]
-                full_path = os.path.join(self.curr_folder, class_name, image_name)
+                relative_path = os.path.join(class_name, row["image_name"])
+                full_path = os.path.join(self.curr_folder, relative_path)
 
                 labels = row[attribute_cols].values.tolist()
 

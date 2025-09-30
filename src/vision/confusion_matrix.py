@@ -289,10 +289,27 @@ def generate_accuracy_data(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-            "`generate_accuracy_data` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+    preds_list = []
+    targets_list = []
+
+    device = torch.device("cuda" if cuda else "cpu")
+    model.to(device)
+
+    with torch.no_grad():
+        for data, target in loader:
+            data = data.to(device)
+            target = target.to(device)
+
+            logits = model(data)
+
+            probs = torch.sigmoid(logits)
+            batch_preds = (probs > 0.5).float()
+
+            preds_list.append(batch_preds.cpu())
+            targets_list.append(target.cpu())
+
+    preds = torch.cat(preds_list)
+    targets = torch.cat(targets_list)
 
     ##########################################################################
     # Student code ends here
@@ -338,10 +355,14 @@ def generate_accuracy_table(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-            "`generate_accuracy_table` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
+    correct_predictions = preds == targets
+
+    num_correct_per_attribute = np.sum(correct_predictions, axis=0)
+
+    total_images = targets.shape[0]
+
+    if total_images > 0:
+        accuracy_table = num_correct_per_attribute / total_images
 
     ##########################################################################
     # Student code ends here

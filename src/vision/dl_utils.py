@@ -92,10 +92,12 @@ def compute_multilabel_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> f
     # Student code begin
     ############################################################################
 
-    raise NotImplementedError(
-        "`compute_multilabel_accuracy` function in "
-        + "`dl_utils.py` needs to be implemented"
-    )
+    with torch.inference_mode():
+        preds = (torch.sigmoid(logits) >= 0.5).float()
+        correct = (preds == labels).sum().item()
+        total = labels.numel()
+        if total > 0:
+            batch_accuracy = correct / total
 
     ############################################################################
     # Student code end

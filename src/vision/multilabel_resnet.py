@@ -24,10 +24,21 @@ class MultilabelResNet18(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__init__` function in "
-            + "`multi_resnet.py` needs to be implemented"
-        )
+        resnet = resnet18(pretrained=True)
+        self.conv_layers = nn.Sequential(*list(resnet.children())[:-1])
+
+        for param in self.conv_layers.parameters():
+            param.requires_grad = False
+
+        for param in resnet.layer4.parameters():  
+            param.requires_grad = True
+        for param in resnet.layer3.parameters():  
+            param.requires_grad = True
+
+        in_feats = resnet.fc.in_features
+        self.activation = nn.Sigmoid()
+        self.fc_layers = nn.Linear(in_feats, 7)
+        self.loss_criterion = nn.BCEWithLogitsLoss(reduction='mean')
 
         ############################################################################
         # Student code end
@@ -47,11 +58,10 @@ class MultilabelResNet18(nn.Module):
         ############################################################################
         # Student code begin
         ############################################################################
-        
-        raise NotImplementedError(
-            "`forward` function in "
-            + "`multi_resnet.py` needs to be implemented"
-        )
+
+        feats = self.conv_layers(x)
+        feats = torch.flatten(feats, start_dim=1)
+        model_output = self.fc_layers(feats)
 
         ############################################################################
         # Student code end

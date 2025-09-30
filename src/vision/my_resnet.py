@@ -22,10 +22,15 @@ class MyResNet18(nn.Module):
         # Student code begin
         ############################################################################
 
-        raise NotImplementedError(
-            "`__init__` function in "
-            + "`my_resnet.py` needs to be implemented"
-        )
+        resnet = resnet18(pretrained=True)
+        self.conv_layers = nn.Sequential(*list(resnet.children())[:-1])
+        
+        for param in self.conv_layers.parameters():
+            param.requires_grad = False
+            
+        in_feats = resnet.fc.in_features
+        self.fc_layers = nn.Linear(in_feats, 15)
+        self.loss_criterion = nn.CrossEntropyLoss(reduction='mean')
 
         ############################################################################
         # Student code end
@@ -46,10 +51,9 @@ class MyResNet18(nn.Module):
         # Student code begin
         ############################################################################
         
-        raise NotImplementedError(
-            "`forward` function in "
-            + "`my_resnet.py` needs to be implemented"
-        )
+        feats = self.conv_layers(x)
+        feats = torch.flatten(feats, start_dim=1)
+        model_output = self.fc_layers(feats)
 
         ############################################################################
         # Student code end
