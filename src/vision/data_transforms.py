@@ -50,10 +50,14 @@ def get_fundamental_augmentation_transforms(
     # Student code begin
     ###########################################################################
 
-    raise NotImplementedError(
-        "`get_fundamental_augmentation_transforms` function in "
-        + "`data_transforms.py` needs to be implemented"
-    )
+    transforms_lst = [
+        transforms.Resize(inp_size),
+        transforms.RandomHorizontalFlip(),  
+        transforms.ColorJitter(brightness=0.3, contrast=0.3),
+        transforms.ToTensor(),
+    ]
+    
+    fund_aug_transforms = transforms.Compose(transforms_lst)
 
     ###########################################################################
     # Student code end
@@ -80,9 +84,12 @@ def get_fundamental_normalization_transforms(
     # Student code begins
     ###########################################################################
 
-    raise NotImplementedError(
-        "`get_fundamental_normalization_transforms` function in "
-        + "`data_transforms.py` needs to be implemented"
+    fund_norm_transforms = transforms.Compose(
+        [
+            transforms.Resize(inp_size),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=pixel_mean, std=pixel_std),
+        ]
     )
 
     ###########################################################################
@@ -110,9 +117,14 @@ def get_all_transforms(
     # Student code begins
     ###########################################################################
 
-    raise NotImplementedError(
-        "`get_all_transforms` function in "
-        + "`data_transforms.py` needs to be implemented"
+    all_transforms = transforms.Compose(
+        [
+            transforms.Resize(inp_size),
+            transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(brightness=0.3, contrast=0.3),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=pixel_mean, std=pixel_std),
+        ]
     )
 
     ###########################################################################

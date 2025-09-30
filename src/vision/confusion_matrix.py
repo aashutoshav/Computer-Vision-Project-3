@@ -44,10 +44,28 @@ def generate_confusion_data(
     # Student code begins here
     ##########################################################################
 
-    raise NotImplementedError(
-        "`generate_confusion_data` function in "
-        + "`confusion_matrix.py` needs to be implemented"
-    )
+    preds_list = []
+    targets_list = []
+
+    for name, idx in label_to_idx.items():
+        class_labels[idx] = name
+
+    device = torch.device("cuda" if cuda else "cpu")
+    model.to(device)
+
+    with torch.no_grad():
+        for data, target in loader:
+            data = data.to(device)
+            target = target.to(device)
+            
+            output = model(data)
+            batch_preds = torch.argmax(output, dim=1)
+
+            preds_list.append(batch_preds.cpu())
+            targets_list.append(target.cpu())
+
+    preds = torch.cat(preds_list)
+    targets = torch.cat(targets_list)
 
     ##########################################################################
     # Student code ends here
@@ -97,12 +115,9 @@ def generate_confusion_matrix(
         ##########################################################################
         # Student code begins here
         ##########################################################################
-    
-        raise NotImplementedError(
-            "`generate_confusion_matrix` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
-        
+
+        confusion_matrix[target, prediction] += 1
+
         ##########################################################################
         # Student code ends here
         ##########################################################################
@@ -111,12 +126,11 @@ def generate_confusion_matrix(
         ##########################################################################
         # Student code begins here
         ##########################################################################
-    
-        raise NotImplementedError(
-            "`generate_confusion_matrix` function in "
-            + "`confusion_matrix.py` needs to be implemented"
-        )
-    
+
+        row_sums = confusion_matrix.sum(axis=1)
+        row_sums[row_sums == 0] = 1
+        confusion_matrix = confusion_matrix / row_sums[:, np.newaxis]
+
         ##########################################################################
         # Student code ends here
         ##########################################################################
