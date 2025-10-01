@@ -93,11 +93,10 @@ def compute_multilabel_accuracy(logits: torch.Tensor, labels: torch.Tensor) -> f
     ############################################################################
 
     with torch.inference_mode():
-        preds = (torch.sigmoid(logits) >= 0.5)
-        correct = (preds == labels.float()).sum().item()
+        preds = (torch.sigmoid(logits) >= 0.5).to(labels.dtype)
+        correct = (preds == labels).sum().item()
         total = labels.numel()
-        if total > 0:
-            batch_accuracy = correct / total
+        batch_accuracy = correct / total
 
     ############################################################################
     # Student code end
